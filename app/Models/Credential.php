@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\SystemConfiguration\AccessManagement;
+use App\Models\SystemConfiguration\UserAccess;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -14,7 +14,7 @@ class Credential extends Authenticatable
 
     protected $table = 'credentials';
     protected $fillable = [
-        'employee_id',
+        'email',
         'password',
         'user_access_id',
         'status',

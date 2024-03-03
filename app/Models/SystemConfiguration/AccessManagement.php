@@ -18,7 +18,6 @@ class AccessManagement extends Model
         'access_points',
         'description',
         'status',
-        'approval_ticket_id',
         'created_by_id',
         'updated_by_id',
     ];
@@ -31,15 +30,5 @@ class AccessManagement extends Model
     public function updatedBy()
     {
         return $this->belongsTo(PersonalInformation::class, 'updated_by_id');
-    }
-
-    public function approvalTicket()
-    {
-        return $this->belongsTo(ApprovalTicket::class, 'approval_ticket_id');
-    }
-
-    public function approvalWorkflow()
-    {
-        return $this->belongsTo(ApprovalWorkflow::class, 'approval_workflow_id');
     }
 }

@@ -12,7 +12,7 @@ class PersonalInformation extends Model
     protected $table = 'personal_informations';
 
     protected $fillable = [
-        'employee_id',
+        'email',
         'prefix',
         'first_name',
         'middle_name',
@@ -22,18 +22,17 @@ class PersonalInformation extends Model
         'gender',
         'birth_date',
         'age',
-        'marital_status',
-        'personal_email',
-        'company_email',
+        'updated_by_id',
         'status',
     ];
 
     public function credential()
     {
-        return $this->belongsTo(Credential::class, 'employee_id', 'employee_id');
+        return $this->belongsTo(Credential::class, 'email', 'email');
     }
-    /*   public function memoranda()
-      {
-          return $this->hasMany(Memoranda::class);
-      } */
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(PersonalInformation::class, 'updated_by_id');
+    }
 }

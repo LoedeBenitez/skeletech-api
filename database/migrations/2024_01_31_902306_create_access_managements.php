@@ -16,15 +16,13 @@ return new class extends Migration {
             $table->string('preset_name');
             $table->text('access_points');
             $table->text('description')->nullable();
-            $table->tinyInteger('status')->default(1); // active 1
-            $table->unsignedBigInteger('approval_ticket_id');
+            $table->tinyInteger('status')->default(1);
             $table->unsignedBigInteger('created_by_id');
             $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
 
             $table->foreign('created_by_id')->references('id')->on('personal_informations');
             $table->foreign('updated_by_id')->references('id')->on('personal_informations');
-            $table->foreign('approval_ticket_id')->references('id')->on('approval_tickets');
 
         });
     }

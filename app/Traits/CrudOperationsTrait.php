@@ -34,7 +34,7 @@ trait CrudOperationsTrait
             $record = new $model();
             $record = $model::find($id);
             if ($record) {
-                $fields['updated_by_id'] = $fields['created_by_id'];
+                $fields['updated_by_id'] = auth()->user()->id;
                 $record->update($fields);
                 return $this->dataResponse('success', Response::HTTP_OK, __('msg.update_success'), $record);
             }
@@ -50,7 +50,6 @@ trait CrudOperationsTrait
                 'display' => 'nullable|integer',
                 'page' => 'nullable|integer',
                 'search' => 'nullable|string',
-                'type' => 'nullable',
             ]);
             $page = $fields['page'] ?? 1;
             $display = $fields['display'] ?? 10;
@@ -64,9 +63,6 @@ trait CrudOperationsTrait
                         }
                     });
                 });
-            if (isset($fields['type'])) {
-                $query->where('type', $fields['type']);
-            }
             if (isset($request['is_pinned'])) {
                 $query->where('is_pinned', $request['is_pinned']);
             }
@@ -76,7 +72,9 @@ trait CrudOperationsTrait
             foreach ($dataList as $key => $value) {
                 $data = $model::findOrFail($value->id);
                 $response = $data->toArray();
-                $response['created_by'] = $data->createdBy->first_name . ' ' . $data->createdBy->middle_name . ' ' . $data->createdBy->last_name;
+                if (isset($data->created_by_id)) {
+                    $response['created_by'] = $data->createdBy->first_name . ' ' . $data->createdBy->middle_name . ' ' . $data->createdBy->last_name;
+                }
                 if (isset($data->updated_by_id)) {
                     $response['updated_by'] = $data->updatedBy->first_name . ' ' . $data->updatedBy->middle_name . ' ' . $data->updatedBy->last_name;
                 }
@@ -102,55 +100,12 @@ trait CrudOperationsTrait
             foreach ($dataList as $key => $value) {
                 $data = $model::findOrFail($value->id);
                 $response = $data->toArray();
-                $response['created_by'] = $data->createdBy->first_name . ' ' . $data->createdBy->middle_name . ' ' . $data->createdBy->last_name;
+
+                if (isset($data->created_by_id)) {
+                    $response['created_by'] = $data->createdBy->first_name . ' ' . $data->createdBy->middle_name . ' ' . $data->createdBy->last_name;
+                }
                 if (isset($data->updated_by_id)) {
                     $response['updated_by'] = $data->updatedBy->first_name . ' ' . $data->updatedBy->middle_name . ' ' . $data->updatedBy->last_name;
-                }
-
-                if (isset($data->internal_system_id)) {
-                    $response['internal_system_short_name'] = $data->internalSystem->short_name;
-                }
-
-                if (isset($data->module_id)) {
-                    $response['module'] = [
-                        'module_name' => $data->module->name,
-                        'internal_system_short_name' => $data->module->internalSystem->short_name
-                    ];
-                }
-
-                if (isset($data->sub_module_id)) {
-                    $collection = $data->subModule;
-                    $response['module'] = [
-                        'sub_module_name' => $collection->name,
-                        'module_name' => $collection->module->name,
-                        'internal_system_short_name' => $collection->module->internalSystem->short_name
-                    ];
-                    $response['module_permission'] = $data->modulePermission->permission_name;
-                }
-
-
-                if (isset($data->approval_workflow_id)) {
-                    $collection = $data->workflow;
-                    $response['approval_workflow'] = [
-                        'approval_workflow_name' => $collection->workflow_name,
-                        'approval_workflow_description' => $collection->description,
-                    ];
-                }
-
-                if (isset($data->approval_level_id)) {
-                    $collection = $data->approvalLevel;
-                    $response['approval_level'] = [
-                        'approval_level_name' => $collection->name,
-                        'approval_level_code' => $collection->approval_code,
-                    ];
-                }
-
-                if (isset($data->approver_id)) {
-                    $collection = $data->approver;
-                    $response['approver_details'] = [
-                        'employee_id' => $collection->employee_id,
-                        'employee_name' => $collection->first_name . ' ' . $collection->middle_name . ' ' . $collection->last_name
-                    ];
                 }
                 $reconstructedList[] = $response;
             }
@@ -168,45 +123,12 @@ trait CrudOperationsTrait
             $data = $model::find($id);
             if ($data) {
                 $response = $data->toArray();
-                $response['created_by'] = $data->createdBy->first_name . ' ' . $data->createdBy->middle_name . ' ' . $data->createdBy->last_name;
+                if (isset($data->created_by_id)) {
+                    $response['created_by'] = $data->createdBy->first_name . ' ' . $data->createdBy->middle_name . ' ' . $data->createdBy->last_name;
+                }
+
                 if (isset($data->updated_by_id)) {
                     $response['updated_by'] = $data->updatedBy->first_name . ' ' . $data->updatedBy->middle_name . ' ' . $data->updatedBy->last_name;
-                }
-
-                if (isset($data->internal_system_id)) {
-                    $response['internal_system'] = $data->internalSystem->short_name;
-                }
-                if (isset($data->module_id)) {
-                    $response['module'] = [
-                        'module_name' => $data->module->name,
-                        'internal_system_short_name' => $data->module->internalSystem->short_name
-                    ];
-                }
-
-                if (isset($data->sub_module_id)) {
-                    $collection = $data->subModule;
-                    $response['module'] = [
-                        'sub_module_name' => $collection->name,
-                        'module_name' => $collection->module->name,
-                        'internal_system_short_name' => $collection->module->internalSystem->short_name
-                    ];
-                    $response['module_permission'] = $data->modulePermission->permission_name;
-                }
-
-                if (isset($data->approval_level_id)) {
-                    $collection = $data->approvalLevel;
-                    $response['approval_level'] = [
-                        'approval_level_name' => $collection->name,
-                        'approval_level_code' => $collection->approval_code,
-                    ];
-                }
-
-                if (isset($data->approver_id)) {
-                    $collection = $data->approver;
-                    $response['approver_details'] = [
-                        'employee_id' => $collection->employee_id,
-                        'employee_name' => $collection->first_name . ' ' . $collection->middle_name . ' ' . $collection->last_name
-                    ];
                 }
                 return $this->dataResponse('success', Response::HTTP_OK, __('msg.record_found'), $response);
             }
@@ -223,7 +145,7 @@ trait CrudOperationsTrait
                 $response = $data->toArray();
                 $response['status'] = !$response['status'];
                 $data->update($response);
-                return $this->dataResponse('success', Response::HTTP_OK, __('msg.record_found'), $response);
+                return $this->dataResponse('success', Response::HTTP_OK, __('msg.update_success'), $response);
             }
             return $this->dataResponse('error', Response::HTTP_OK, __('msg.record_not_found'));
         } catch (Exception $exception) {
@@ -270,47 +192,12 @@ trait CrudOperationsTrait
             if ($data) {
                 $reconstructedList = [];
                 foreach ($data as $response) {
-                    $response['created_by'] = $response->createdBy->first_name . ' ' . $response->createdBy->middle_name . ' ' . $response->createdBy->last_name;
+                    if (isset($data->created_by_id)) {
+                        $response['created_by'] = $data->createdBy->first_name . ' ' . $data->createdBy->middle_name . ' ' . $data->createdBy->last_name;
+                    }
                     if (isset($response->updated_by_id)) {
                         $response['updated_by'] = $response->updatedBy->first_name . ' ' . $response->updatedBy->middle_name . ' ' . $response->updatedBy->last_name;
                     }
-
-                    if (isset($response->internal_system_id)) {
-                        $response['internal_system'] = $response->internalSystem->short_name;
-                    }
-                    if (isset($response->module_id)) {
-                        $response['module'] = [
-                            'module_name' => $response->module->name,
-                            'internal_system_short_name' => $response->module->internalSystem->short_name
-                        ];
-                    }
-
-                    if (isset($response->sub_module_id)) {
-                        $collection = $response->subModule;
-                        $response['module'] = [
-                            'sub_module_name' => $collection->name,
-                            'module_name' => $collection->module->name,
-                            'internal_system_short_name' => $collection->module->internalSystem->short_name
-                        ];
-                        $response['module_permission'] = $response->modulePermission->permission_name;
-                    }
-
-                    if (isset($response->approval_level_id)) {
-                        $collection = $response->approvalLevel;
-                        $response['approval_level'] = [
-                            'approval_level_name' => $collection->name,
-                            'approval_level_code' => $collection->approval_code,
-                        ];
-                    }
-
-                    if (isset($response->approver_id)) {
-                        $collection = $response->approver;
-                        $response['approver_details'] = [
-                            'employee_id' => $collection->employee_id,
-                            'employee_name' => $collection->first_name . ' ' . $collection->middle_name . ' ' . $collection->last_name
-                        ];
-                    }
-
                     $reconstructedList[] = $response;
                 }
 

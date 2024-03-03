@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('personal_informations', function (Blueprint $table) {
             $table->id();
-            $table->string('employee_id');
+            $table->string('email');
             $table->string('prefix')->nullable();
             $table->string('first_name');
             $table->string('middle_name')->nullable();
@@ -19,14 +19,14 @@ return new class extends Migration {
             $table->string('gender')->nullable();
             $table->date('birth_date')->nullable();
             $table->integer('age')->nullable();
-            $table->string('marital_status')->nullable();
-            $table->string('personal_email')->nullable();
-            $table->string('company_email')->nullable();
             $table->tinyInteger('status')->default(1);
+            $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
 
+            $table->foreign('updated_by_id')->references('id')->on('personal_informations');
+
             // Define the foreign key constraint
-            $table->foreign('employee_id')->references('employee_id')->on('credentials')->onDelete('cascade');
+            $table->foreign('email')->references('email')->on('credentials')->onDelete('cascade');
         });
     }
 

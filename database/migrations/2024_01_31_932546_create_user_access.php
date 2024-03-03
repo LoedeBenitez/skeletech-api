@@ -13,9 +13,7 @@ return new class extends Migration {
         Schema::create('user_access', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('credential_id');
-            $table->string('customized_user_access')->nullable();
             $table->unsignedBigInteger('access_management_id');
-            $table->unsignedBigInteger('is_customized')->default(0);
             $table->unsignedBigInteger('created_by_id');
             $table->unsignedBigInteger('updated_by_id')->nullable();
             $table->timestamps();
