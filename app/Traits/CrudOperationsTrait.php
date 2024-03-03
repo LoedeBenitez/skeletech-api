@@ -50,6 +50,7 @@ trait CrudOperationsTrait
                 'display' => 'nullable|integer',
                 'page' => 'nullable|integer',
                 'search' => 'nullable|string',
+                'status' => 'nullable|integer',
             ]);
             $page = $fields['page'] ?? 1;
             $display = $fields['display'] ?? 10;
@@ -63,8 +64,8 @@ trait CrudOperationsTrait
                         }
                     });
                 });
-            if (isset($request['is_pinned'])) {
-                $query->where('is_pinned', $request['is_pinned']);
+            if (isset($request['status'])) {
+                $query->where('status', $request['status']);
             }
             $dataList = $query->limit($display)->offset($offset)->get();
             $totalPage = max(ceil($query->count() / $display), 1);
